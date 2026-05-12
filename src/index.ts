@@ -6,8 +6,7 @@ import adminApi from "./routes/admins/index.route";
 import { connectDatabase } from "./configs/database.config";
 const app = express()
 const port = process.env.PORT
-connectDatabase();
-
+app.set("trust proxy", 1);
 app.use(cors({
   origin: [
     String(process.env.FE_HOST)
@@ -16,6 +15,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }))
+connectDatabase();
 app.use(express.json())
 app.use(cookieParser());
 app.use("/api/admin", adminApi);
