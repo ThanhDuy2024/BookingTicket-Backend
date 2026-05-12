@@ -38,6 +38,7 @@ export const adminLogin = async (req: Request, res: Response) => {
         secure: true,
         sameSite: process.env.PRODUCTION === "false" ? "lax" : "none",
         partitioned: true,
+        path: "/"
       })
     }
 
