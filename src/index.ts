@@ -8,13 +8,11 @@ const app = express()
 const port = process.env.PORT
 app.set("trust proxy", 1);
 app.use(cors({
-  origin: [
-    String(process.env.FE_HOST)
-  ],
+  origin: process.env.FE_HOST, // Đảm bảo FE_HOST không có dấu / ở cuối
   methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'set-cookie'],
   credentials: true,
-}))
+}));
 connectDatabase();
 app.use(express.json())
 app.use(cookieParser());
