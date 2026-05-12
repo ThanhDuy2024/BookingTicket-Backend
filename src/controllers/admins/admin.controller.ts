@@ -36,7 +36,8 @@ export const adminLogin = async (req: Request, res: Response) => {
         maxAge: 60 * 60 * 1000,
         httpOnly: true,
         secure: true,
-        sameSite: process.env.PRODUCTION === "false" ? "lax" : "none"
+        sameSite: process.env.PRODUCTION === "false" ? "lax" : "none",
+        partitioned: true,
       })
     }
 
