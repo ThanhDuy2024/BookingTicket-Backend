@@ -25,9 +25,9 @@ export const adminLogin = async (req: Request, res: Response) => {
   try {
     const data: LoginDto = req.body;
     const message = await LoginService(data);
-
+    let token
     if(message.code === "success") {
-      const token = jwt.sign({
+      token = jwt.sign({
         name: message.data?.name,
         id: message.data?.id
       }, String(process.env.JWT_PASSWORD));
@@ -44,7 +44,8 @@ export const adminLogin = async (req: Request, res: Response) => {
 
     return res.status(message.status).json({
       code: message.code,
-      message: message.message
+      message: message.message,
+      cookie: token
     });
   } catch (error) {
     console.log(error);
