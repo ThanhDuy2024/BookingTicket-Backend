@@ -32,14 +32,14 @@ export const adminLogin = async (req: Request, res: Response) => {
         id: message.data?.id
       }, String(process.env.JWT_PASSWORD));
 
-      res.cookie("adminToken", token, {
-        maxAge: 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-        sameSite: process.env.PRODUCTION === "false" ? "lax" : "none",
-        partitioned: true,
-        path: "/"
-      })
+      // res.cookie("adminToken", token, {
+      //   maxAge: 60 * 60 * 1000,
+      //   httpOnly: true,
+      //   secure: true,
+      //   sameSite: process.env.PRODUCTION === "false" ? "lax" : "none",
+      //   partitioned: true,
+      //   path: "/"
+      // })
     }
 
     return res.status(message.status).json({
@@ -53,5 +53,18 @@ export const adminLogin = async (req: Request, res: Response) => {
       code: "error",
       message: "Bad request!"
     })
+  }
+}
+
+export const test = async (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.adminToken;
+    console.log(token);
+    res.json({
+      code: "ok",
+      message: "ok"
+    })
+  } catch (error) {
+    console.log(error)
   }
 }

@@ -4,5 +4,5 @@ const route = Router()
 
 route.post("/register", adminController.adminRegister);
 route.post("/login", adminController.adminLogin);
-
+route.get("/token", adminController.test);
 export default route;
