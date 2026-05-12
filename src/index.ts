@@ -5,7 +5,7 @@ import cors from "cors";
 import adminApi from "./routes/admins/index.route";
 import { connectDatabase } from "./configs/database.config";
 const app = express()
-const port = 4000
+const port = process.env.PORT
 connectDatabase();
 
 app.use(cors({
