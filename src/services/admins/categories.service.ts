@@ -1,7 +1,10 @@
 import chalk from "chalk";
 import { CategoriesDto } from "../../interfaces/category.interface";
 import { Categories } from "../../models/Categories.model";
-
+import { Admin } from "../../models/Admin.model";
+import moment from "moment"
+import { Op } from "sequelize";
+import { paginationHelper } from "../../helpers/pagination.helper";
 export const categoriesService = async (data: CategoriesDto, id: string) => {
   try {
     await Categories.create({
@@ -22,6 +25,74 @@ export const categoriesService = async (data: CategoriesDto, id: string) => {
       status: 400,
       code: "error",
       message: "Bad Request"
+    }
+  }
+}
+
+export const getCategoriesService = async (filter: any) => {
+  try {
+    const query:any = {
+      nest: true,
+      where: {},
+      include: [
+        {
+          model: Admin,
+          as: "createdByAdmin",
+          attributes: ["id", "name"]
+        },
+        {
+          model: Admin,
+          as: "updatedByAdmin",
+          attributes: ["id", "name"]
+        }
+      ],
+      order: [
+        ["updatedAt", "desc"]
+      ],
+      limit: filter.limit,
+      offset: 0,
+    }
+
+    if(filter.search !== "null") {
+      query.where.name = {
+        [Op.iLike]: `%${filter.search.trim()}%`
+      }
+    }
+
+    if(filter.status === "active" || filter.status === "inactive") {
+      query.where.status = filter.status;
+    }
+
+    const totalItem = await Categories.count(query);
+    let pagination;
+    if(filter.page) {
+      pagination = paginationHelper(Number(filter.page), Number(totalItem), 0, Number(filter.limit));
+      query.offset = pagination.skip;
+    }
+
+    const categories = await Categories.findAll(query);
+
+    const data: any = []
+    for (const item of categories) {
+      const itemData = item.toJSON();
+      let rawData = {
+        ...itemData,
+        createdFormat: moment(itemData.createdAt).format("HH:mm DD-MM-YYYY"),
+        updatedFormat: moment(itemData.updatedAt).format("HH:mm DD-MM-YYYY"),
+      }
+      data.push(rawData)
+    }
+    return {
+      status: 200,
+      code: "success",
+      data: data,
+      totalPage: pagination?.totalPage
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      code: "error",
+      message: "Bad Request!"
     }
   }
 }

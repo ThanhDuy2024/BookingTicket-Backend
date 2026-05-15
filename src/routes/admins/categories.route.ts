@@ -6,6 +6,7 @@ const route = Router();
 const upload = multer({
   storage: storage
 })
-route.post("/create", upload.single("image"), categoryController.postCategoriesController);
 
+route.post("/create", upload.single("image"), categoryController.postCategoriesController);
+route.get("/list", categoryController.getCategoriesController);
 export default route;
