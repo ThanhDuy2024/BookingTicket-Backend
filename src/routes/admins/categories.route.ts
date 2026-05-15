@@ -11,4 +11,5 @@ route.post("/create", upload.single("image"), categoryController.postCategoriesC
 route.get("/list", categoryController.getCategoriesController);
 route.get("/detail/:id", categoryController.categoriesDtailController);
 route.put("/update/:id", upload.single("image"), categoryController.putCategoriesController);
+route.delete("/delete/:id", categoryController.deleteCategoriesController);
 export default route;

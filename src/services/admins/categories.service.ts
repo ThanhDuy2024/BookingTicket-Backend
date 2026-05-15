@@ -159,7 +159,8 @@ export const putCategoriesService = async (data: CategoriesDto, id: string, cate
     await category.update({
       name: data.name,
       image: data.image,
-      status: data.status
+      status: data.status,
+      updatedBy: id
     })
 
     return {
@@ -169,6 +170,42 @@ export const putCategoriesService = async (data: CategoriesDto, id: string, cate
     }
   } catch (error) {
     console.log(error);
+    return {
+      status: 400,
+      code: "error",
+      message: "Bad request in service!"
+    }
+  }
+}
+
+export const deleteCategoryService = async (categoryId: string, adminId: string) => {
+  try {
+    const category = await Categories.findOne({
+      where: {
+        id: categoryId,
+        status: ["active", "inactive"]
+      }
+    });
+
+    if (!category) {
+      return {
+        status: 404,
+        code: "error",
+        message: "Category not found!"
+      }
+    };
+
+    await category.update({
+      status: "deleted",
+      updatedBy: adminId,
+    });
+    return {
+      status: 200,
+      code: "success",
+      message: "Delete category successfully!"
+    }
+  } catch (error) {
+    console.log(error)
     return {
       status: 400,
       code: "error",
