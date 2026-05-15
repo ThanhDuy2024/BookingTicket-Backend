@@ -99,7 +99,7 @@ export const getCategoriesService = async (filter: any) => {
 
 export const categoriesDetailService = async (id: string) => {
   try {
-    const category: any= await Categories.findOne({
+    const category: any = await Categories.findOne({
       nest: true,
       raw: true,
       where: {
@@ -113,7 +113,7 @@ export const categoriesDetailService = async (id: string) => {
           attributes: ["id", "name"]
         },
         {
-          model: Admin, 
+          model: Admin,
           as: "updatedByAdmin",
           attributes: ["id", "name"]
         }
@@ -129,6 +129,43 @@ export const categoriesDetailService = async (id: string) => {
       status: 200,
       code: "success",
       data: data
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 400,
+      code: "error",
+      message: "Bad request in service!"
+    }
+  }
+}
+
+export const putCategoriesService = async (data: CategoriesDto, id: string, categoryId: string) => {
+  try {
+    const category = await Categories.findOne({
+      where: {
+        id: categoryId,
+      }
+    });
+
+    if (!category) {
+      return {
+        status: 404,
+        code: "error",
+        message: "Category not found!"
+      }
+    }
+
+    await category.update({
+      name: data.name,
+      image: data.image,
+      status: data.status
+    })
+
+    return {
+      status: 200,
+      code: "success",
+      message: "Update category successfully!"
     }
   } catch (error) {
     console.log(error);

@@ -1,8 +1,7 @@
 import { Response } from "express";
 import { admin } from "../../interfaces/admin.interface";
 import { CategoriesDto } from "../../interfaces/category.interface";
-import { categoriesDetailService, categoriesService, getCategoriesService } from "../../services/admins/categories.service";
-
+import { categoriesDetailService, categoriesService, getCategoriesService, putCategoriesService } from "../../services/admins/categories.service";
 export const postCategoriesController = async (req: admin, res: Response) => {
   try {
     if(req.file) {
@@ -63,6 +62,30 @@ export const categoriesDtailController = async (req: admin, res: Response) => {
     return res.status(400).json({
       code: "error",
       message: "Bad request in controller!"
+    })
+  }
+}
+
+export const putCategoriesController = async (req: admin, res: Response) => {
+  try {
+    if(req.file) {
+      req.body.image = req.file.path;
+    } else {
+      delete req.body.image;
+    }
+    const id = req.params.id;
+    const data: CategoriesDto = req.body;
+    const message = await putCategoriesService(data, req.admin.id, String(id));
+
+    return res.status(message.status).json({
+      code: message.code,
+      message: message.message,
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      code: "error",
+      message: "Bad request in controller"
     })
   }
 }
