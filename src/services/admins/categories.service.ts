@@ -33,7 +33,9 @@ export const getCategoriesService = async (filter: any) => {
   try {
     const query: any = {
       nest: true,
-      where: {},
+      where: {
+        status: ["active", "inactive"]
+      },
       include: [
         {
           model: Admin,
