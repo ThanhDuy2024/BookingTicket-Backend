@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { admin } from "../../interfaces/admin.interface";
 import { CategoriesDto } from "../../interfaces/category.interface";
-import { categoriesService, getCategoriesService } from "../../services/admins/categories.service";
+import { categoriesDetailService, categoriesService, getCategoriesService } from "../../services/admins/categories.service";
 
 export const postCategoriesController = async (req: admin, res: Response) => {
   try {
@@ -46,6 +46,23 @@ export const getCategoriesController = async (req: admin, res: Response) => {
     res.status(400).json({
       code: "error",
       message: "Bad Request!"
+    })
+  }
+}
+
+export const categoriesDtailController = async (req: admin, res: Response) => {
+  try {
+    const id: string = String(req.params.id);
+    const message = await categoriesDetailService(id);
+    return res.status(message.status).json({
+      code: message.code,
+      data: message.data
+    })
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      code: "error",
+      message: "Bad request in controller!"
     })
   }
 }

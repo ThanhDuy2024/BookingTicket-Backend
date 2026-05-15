@@ -31,7 +31,7 @@ export const categoriesService = async (data: CategoriesDto, id: string) => {
 
 export const getCategoriesService = async (filter: any) => {
   try {
-    const query:any = {
+    const query: any = {
       nest: true,
       where: {},
       include: [
@@ -53,19 +53,19 @@ export const getCategoriesService = async (filter: any) => {
       offset: 0,
     }
 
-    if(filter.search !== "null") {
+    if (filter.search !== "null") {
       query.where.name = {
         [Op.iLike]: `%${filter.search.trim()}%`
       }
     }
 
-    if(filter.status === "active" || filter.status === "inactive") {
+    if (filter.status === "active" || filter.status === "inactive") {
       query.where.status = filter.status;
     }
 
     const totalItem = await Categories.count(query);
     let pagination;
-    if(filter.page) {
+    if (filter.page) {
       pagination = paginationHelper(Number(filter.page), Number(totalItem), 0, Number(filter.limit));
       query.offset = pagination.skip;
     }
@@ -93,6 +93,49 @@ export const getCategoriesService = async (filter: any) => {
       status: 400,
       code: "error",
       message: "Bad Request!"
+    }
+  }
+}
+
+export const categoriesDetailService = async (id: string) => {
+  try {
+    const category: any= await Categories.findOne({
+      nest: true,
+      raw: true,
+      where: {
+        id: id,
+        status: ["active", "inactive"]
+      },
+      include: [
+        {
+          model: Admin,
+          as: "createdByAdmin",
+          attributes: ["id", "name"]
+        },
+        {
+          model: Admin, 
+          as: "updatedByAdmin",
+          attributes: ["id", "name"]
+        }
+      ]
+    });
+
+    const data = {
+      ...category,
+      createdFormat: moment(category.createdAt).format("HH:mm DD/MM/YYYY"),
+      updatedFormat: moment(category.updatedAt).format("HH:mm DD/MM/YYYY"),
+    }
+    return {
+      status: 200,
+      code: "success",
+      data: data
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 400,
+      code: "error",
+      message: "Bad request in service!"
     }
   }
 }

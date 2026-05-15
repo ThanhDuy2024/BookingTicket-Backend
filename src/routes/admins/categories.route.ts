@@ -9,4 +9,5 @@ const upload = multer({
 
 route.post("/create", upload.single("image"), categoryController.postCategoriesController);
 route.get("/list", categoryController.getCategoriesController);
+route.get("/detail/:id", categoryController.categoriesDtailController);
 export default route;
