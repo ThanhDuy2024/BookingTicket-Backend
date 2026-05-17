@@ -7,5 +7,5 @@ const upload = multer({
   storage: storage
 })
 route.post("/create", upload.single("image"), moviesController.postMovieController);
-
+route.get("/list", moviesController.getMovieController);
 export default route;

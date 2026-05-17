@@ -1,5 +1,8 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../configs/database.config";
+import { Admin } from "./Admin.model";
+import { Categories } from "./Categories.model";
+import { Movies_Categories } from "./Movies_Categories.mode";
 
 export const Movies = sequelize.define("Movies", {
   id: {
@@ -57,13 +60,39 @@ export const Movies = sequelize.define("Movies", {
     allowNull: false
   },
   createdBy: {
-    type: DataTypes.STRING,
-    allowNull: true
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: "Admins",
+      key: "id"
+    }
   },
+
   updatedBy: {
-    type: DataTypes.STRING,
-    allowNull: true
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: "Admins",
+      key: "id"
+    }
   }
 }, {
   timestamps: true
 })
+
+Movies.belongsTo(Admin, {
+  foreignKey: "createdBy",
+  as: "creator"
+});
+
+Admin.hasMany(Movies, {
+  foreignKey: "createdBy",
+  as: "movies"
+});
+
+Movies.belongsToMany(Categories, {
+  through: Movies_Categories,
+  as: "categories",
+  foreignKey: "movieId",
+  otherKey: "categoryId"
+});
