@@ -68,7 +68,7 @@ export const CreateMovieService = async (data: Movie, adminId: string) => {
 
 export const MovieListService = async (filter: any) => {
   try {
-    const query:any = {
+    const query: any = {
       distinct: true,
       where: {},
       include: [
@@ -85,27 +85,27 @@ export const MovieListService = async (filter: any) => {
       offset: 0
     }
 
-    if(filter.search !== 'null') {
+    if (filter.search !== 'null') {
       query.where.name = {
         [Op.iLike]: `%${filter.search}%`
       }
     }
 
-    if(filter.duration) {
+    if (filter.duration) {
       query.order = [
         ["duration", String(filter.duration)]
       ]
     }
 
-    if(filter.country) {
+    if (filter.country) {
       query.where.country = filter.country
     }
 
-    if(filter.status === "active" || filter.status === "inactive") {
+    if (filter.status === "active" || filter.status === "inactive") {
       query.where.status = filter.status
     }
 
-    if(filter.imdbRating) {
+    if (filter.imdbRating) {
       query.order = [
         ["imdbRating", String(filter.imdbRating)]
       ]
@@ -113,7 +113,7 @@ export const MovieListService = async (filter: any) => {
 
     const totalItem = await Movies.count(query)
     let pagination: any;
-    if(filter.page) {
+    if (filter.page) {
       pagination = paginationHelper(Number(filter.page), Number(totalItem), 0, Number(filter.limit))
       query.offset = pagination.skip
     }
@@ -137,6 +137,43 @@ export const MovieListService = async (filter: any) => {
     }
   } catch (error) {
     console.log(error);
+    return {
+      status: 400,
+      code: "error",
+      message: "error in movie service"
+    }
+  }
+}
+
+export const MovieDetailService = async (movieId: string) => {
+  try {
+    const movie = await Movies.findOne({
+      where: {
+        id: movieId
+      },
+      include: [
+        {
+          model: Admin,
+          as: "creator",
+          attributes: ["id", "name"]
+        },
+        {
+          model: Categories,
+          as: "categories",
+          attributes: ["id", "name"],
+          where: {
+            status: "active"
+          }
+        }
+      ],
+    })
+    return {
+      status: 200,
+      code: "success",
+      data: movie
+    }
+  } catch (error) {
+    console.log(error)
     return {
       status: 400,
       code: "error",
