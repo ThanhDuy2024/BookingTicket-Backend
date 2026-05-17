@@ -181,3 +181,96 @@ export const MovieDetailService = async (movieId: string) => {
     }
   }
 }
+
+export const UpdateMovieService = async (data: Movie, movieId: string, adminId: string) => {
+  try {
+    const categoryList = JSON.parse(data.categoryList);
+    data.duration = Number(data.duration);
+    data.imdbRating = Number(data.imdbRating);
+
+    const movie = await Movies.findOne({
+      where: {
+        id: movieId
+      }
+    })
+
+    if (!movie) {
+      return {
+        status: 404,
+        code: "error",
+        message: "Movie not found!"
+      }
+    }
+
+    // check categories
+    const categories = await Categories.findAll({
+      where: {
+        id: {
+          [Op.in]: categoryList
+        },
+        status: "active"
+      }
+    });
+
+    if (categories.length !== categoryList.length) {
+      return {
+        status: 400,
+        code: "error",
+        message: "Invalid categories!"
+      };
+    }
+
+    await Movies.update(
+      {
+        name: data.name,
+        originalName: data.originalName,
+        description: data.description,
+        trailerUrl: data.trailerUrl,
+        duration: data.duration,
+        releaseDate: data.releaseDate,
+        country: data.country,
+        ageRating: data.ageRating,
+        status: data.status,
+        imdbRating: data.imdbRating,
+        actors: data.actors,
+        image: data.image,
+        updatedBy: adminId
+      },
+      {
+        where: {
+          id: movieId
+        }
+      }
+    );
+
+    // remove old categories
+    await Movies_Categories.destroy({
+      where: {
+        movieId: movieId
+      }
+    });
+
+    // add new categories
+    const movieCategories = categoryList.map(
+      (categoryId: string) => ({
+        movieId: movieId,
+        categoryId
+      })
+    );
+
+    await Movies_Categories.bulkCreate(movieCategories);
+
+    return {
+      status: 200,
+      code: "success",
+      message: "Update movie successfully!"
+    }
+  } catch (error) {
+    console.log(error)
+    return {
+      status: 400,
+      code: "error",
+      message: "error in movie service"
+    }
+  }
+}

@@ -9,4 +9,5 @@ const upload = multer({
 route.post("/create", upload.single("image"), moviesController.postMovieController);
 route.get("/list", moviesController.getMovieController);
 route.get("/detail/:id", moviesController.movieDetailController);
+route.put("/update/:id", upload.single("image"), moviesController.updateMovieController);
 export default route;
