@@ -274,3 +274,39 @@ export const UpdateMovieService = async (data: Movie, movieId: string, adminId: 
     }
   }
 }
+
+export const DeleteMovieService = async (movieId: string, adminId: string) => {
+  try {
+    const movie = await Movies.findOne({
+      where: {
+        id: movieId,
+        status: ["active", "inactive"]
+      }
+    });
+
+    if (!movie) {
+      return {
+        status: 404,
+        code: "error",
+        message: "Movie not found!"
+      }
+    }
+
+    await movie.update({
+      status: "deleted",
+      updatedBy: adminId,
+    })
+    return {
+      status: 200,
+      code: "success",
+      message: "Delete movie successfully!"
+    }
+  } catch (error) {
+    console.log(error)
+    return {
+      status: 400,
+      code: "error",
+      message: "error in movie service"
+    }
+  }
+}

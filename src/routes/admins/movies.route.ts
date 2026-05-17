@@ -10,4 +10,5 @@ route.post("/create", upload.single("image"), moviesController.postMovieControll
 route.get("/list", moviesController.getMovieController);
 route.get("/detail/:id", moviesController.movieDetailController);
 route.put("/update/:id", upload.single("image"), moviesController.updateMovieController);
+route.delete("/delete/:id", moviesController.deleteMovieController);
 export default route;
