@@ -70,7 +70,9 @@ export const MovieListService = async (filter: any) => {
   try {
     const query: any = {
       distinct: true,
-      where: {},
+      where: {
+        status: ["active", "inactive"]
+      },
       include: [
         {
           model: Admin,
