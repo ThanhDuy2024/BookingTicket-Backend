@@ -11,7 +11,13 @@ export const CreateMovieService = async (data: Movie, adminId: string) => {
   try {
     data.duration = Number(data.duration);
     data.imdbRating = Number(data.imdbRating);
-    const categoryList = JSON.parse(data.categoryList);
+    let categoryList;
+    const checkType = typeof data.categoryList;
+    if (checkType === "string") {
+      categoryList = JSON.parse(data.categoryList)
+    } else {
+      categoryList = data.categoryList
+    }
 
     const categories = await Categories.findAll({
       where: {
@@ -147,7 +153,7 @@ export const MovieListService = async (filter: any) => {
   }
 }
 
-export const MovieDetailService = async (movieId: string) => {
+export const MovieDetailService = async (movieId: any) => {
   try {
     const movie = await Movies.findOne({
       where: {
@@ -186,9 +192,15 @@ export const MovieDetailService = async (movieId: string) => {
 
 export const UpdateMovieService = async (data: Movie, movieId: string, adminId: string) => {
   try {
-    const categoryList = JSON.parse(data.categoryList);
     data.duration = Number(data.duration);
     data.imdbRating = Number(data.imdbRating);
+    let categoryList;
+    const checkType = typeof data.categoryList;
+    if (checkType === "string") {
+      categoryList = JSON.parse(data.categoryList)
+    } else {
+      categoryList = data.categoryList
+    }
 
     const movie = await Movies.findOne({
       where: {

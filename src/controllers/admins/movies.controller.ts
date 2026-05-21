@@ -53,7 +53,7 @@ export const getMovieController = async (req: admin, res: Response) => {
 
 export const movieDetailController = async (req: admin, res: Response) => {
   try {
-    const message = await MovieDetailService(String(req.params.id));
+    const message = await MovieDetailService(req.params.id);
     return res.status(message.status).json({
       code: message.code,
       data: message.data,
