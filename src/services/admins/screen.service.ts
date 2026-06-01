@@ -1,6 +1,10 @@
+import moment from "moment";
 import { ScreenDto } from "../../interfaces/screen.interface";
 import { Screens } from "../../models/Screens.model";
 import { Seats } from "../../models/Seates.model";
+import { Admin } from "../../models/Admin.model";
+import { Op } from "sequelize";
+import { paginationHelper } from "../../helpers/pagination.helper";
 
 export const createScreenService = async (data: ScreenDto, adminId: any) => {
   try {
@@ -23,6 +27,68 @@ export const createScreenService = async (data: ScreenDto, adminId: any) => {
       status: 200,
       code: "success",
       message: "Screen create successfully!"
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 400,
+      code: "error",
+      message: "error screen service!"
+    }
+  }
+}
+
+export const getScreenService = async (filter: any) => {
+  try {
+    const query: any = {
+      nest: true,
+      distinct: true,
+      include: {
+        model: Admin,
+        as: "updator",
+        attributes: ["id", "name"]
+      },
+      where: {},
+      order: [
+        ["updatedAt", "desc"]
+      ],
+      offset: 0,
+      limit: filter.limit ? filter.limit : 10
+    }
+
+    if(filter.search) {
+      query.where.name = {
+        [Op.iLike]: `%${filter.search}%`
+      }
+    }
+
+    const totalItem = await Screens.count(query);
+    let pagination: any
+    if(filter.page) {
+      pagination = paginationHelper(Number(filter.page), Number(totalItem), 0, filter.limit);
+      query.offset = pagination.skip;
+    }
+
+    const screens = await Screens.findAll(query)
+
+    const data: any = [];
+    for (const item of screens) {
+      const createdAt = item.dataValues.createdAt;
+      const updatedAt = item.dataValues.updatedAt;
+      const createdAtFormat = moment(createdAt).format("HH:mm DD/MM/YYYY");
+      const updatedAtFormat = moment(updatedAt).format("HH:mm DD/MM/YYYY");
+      data.push({
+        ...item.dataValues,
+        createdAtFormat: createdAtFormat,
+        updatedAtFormat: updatedAtFormat
+      })
+    }
+
+    return {
+      status: 200,
+      code: "success",
+      data: screens,
+      totalPage: pagination.totalPage
     }
   } catch (error) {
     console.log(error);
