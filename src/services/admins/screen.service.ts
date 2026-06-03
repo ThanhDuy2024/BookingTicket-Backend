@@ -5,6 +5,7 @@ import { Seats } from "../../models/Seates.model";
 import { Admin } from "../../models/Admin.model";
 import { Op } from "sequelize";
 import { paginationHelper } from "../../helpers/pagination.helper";
+import { UUID } from "node:crypto";
 
 export const createScreenService = async (data: ScreenDto, adminId: any) => {
   try {
@@ -56,7 +57,7 @@ export const getScreenService = async (filter: any) => {
       limit: filter.limit ? filter.limit : 10
     }
 
-    if(filter.search) {
+    if (filter.search) {
       query.where.name = {
         [Op.iLike]: `%${filter.search}%`
       }
@@ -64,7 +65,7 @@ export const getScreenService = async (filter: any) => {
 
     const totalItem = await Screens.count(query);
     let pagination: any
-    if(filter.page) {
+    if (filter.page) {
       pagination = paginationHelper(Number(filter.page), Number(totalItem), 0, filter.limit);
       query.offset = pagination.skip;
     }
@@ -89,6 +90,53 @@ export const getScreenService = async (filter: any) => {
       code: "success",
       data: screens,
       totalPage: pagination.totalPage
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 400,
+      code: "error",
+      message: "error screen service!"
+    }
+  }
+}
+
+export const getScreenDetailService = async (screenId: any, adminId: any) => {
+  try {
+    const screen = await Screens.findOne({
+      include: [
+        {
+          model: Admin,
+          as: "updator",
+          attributes: ["id", "name"]
+        },
+        {
+          model: Seats,
+          as: "seats",
+          attributes: ["id", "name"]
+        }
+      ],
+      where: {
+        id: screenId,
+      }
+    })
+
+    if (!screen) {
+      return {
+        status: 404,
+        code: "error",
+        message: "Screen not found!"
+      }
+    }
+
+    const data: any = screen.dataValues;
+    data.createdAtFormat = moment(data.createdAt).format("HH:mm DD/MM/YYYY");
+    data.updatedAtFormat = moment(data.updatedAt).format("HH:mm DD/MM/YYYY");
+    
+    return {
+      status: 200,
+      code: "success",
+      data: data
     }
   } catch (error) {
     console.log(error);

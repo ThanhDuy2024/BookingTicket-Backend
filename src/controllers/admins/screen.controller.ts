@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { admin } from "../../interfaces/admin.interface";
-import { createScreenService, getScreenService } from "../../services/admins/screen.service";
+import { createScreenService, getScreenDetailService, getScreenService } from "../../services/admins/screen.service";
 
 export const postScreenController = async (req: admin, res: Response) => {
   try {
@@ -31,6 +31,22 @@ export const getScreenController = async (req: admin, res: Response) => {
       code: message.code,
       data: message.data,
       totalPage: message.totalPage
+    })
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      code: "error",
+      message: "Bad request in controller"
+    })
+  }
+}
+
+export const getScreenDetailController = async (req: admin, res: Response) => {
+  try {
+    const message = await getScreenDetailService(req.params.id, req.admin.id);
+    return res.status(message.status).json({
+      code: message.code,
+      data: message.data,
     })
   } catch (error) {
     console.log(error);
