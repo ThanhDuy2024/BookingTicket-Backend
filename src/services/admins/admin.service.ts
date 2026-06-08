@@ -80,3 +80,26 @@ export const LoginService = async (data: LoginDto) => {
     }
   }
 }
+
+export const ProfileService = async (adminId: any) => {
+  try {
+    const admin = await Admin.findOne({
+      where: {
+        id: adminId,
+      },
+      attributes: ["id", "name", "email", "image", "address", "phone", "roleId"]
+    })
+    return {
+      status: 200,
+      code: "success",
+      data: admin?.dataValues
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 400,
+      code: "error", 
+      message: "Data is not found!"
+    }
+  }
+}

@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { LoginDto, RegisterDto } from "../../interfaces/admin.interface";
-import { LoginService, RegisterService } from "../../services/admins/admin.service";
+import { admin, LoginDto, RegisterDto } from "../../interfaces/admin.interface";
+import { LoginService, ProfileService, RegisterService } from "../../services/admins/admin.service";
 import jwt from "jsonwebtoken"
 export const adminRegister = async (req: Request, res: Response) => {
   try {
     const data: RegisterDto = req.body;
     const message = await RegisterService(data);
 
-    if(message.code === "error") {
+    if (message.code === "error") {
       return res.status(400).json(message);
     }
 
@@ -26,7 +26,7 @@ export const adminLogin = async (req: Request, res: Response) => {
     const data: LoginDto = req.body;
     const message = await LoginService(data);
     let token
-    if(message.code === "success") {
+    if (message.code === "success") {
       token = jwt.sign({
         name: message.data?.name,
         id: message.data?.id
@@ -56,15 +56,18 @@ export const adminLogin = async (req: Request, res: Response) => {
   }
 }
 
-export const test = async (req: Request, res: Response) => {
+export const profileAdminController = async (req: admin, res: Response) => {
   try {
-    const token = req.cookies.adminToken;
-    console.log(token);
-    res.json({
-      code: "ok",
-      message: "ok"
-    })
+    const data = await ProfileService(req.admin.id);
+    return res.status(data.status).json({
+      code: data.code,
+      data: data
+    });
   } catch (error) {
     console.log(error)
+    return res.status(400).json({
+      code: "error",
+      message: "Bad request!"
+    })
   }
 }
